@@ -5,23 +5,23 @@ API_KEY = "YOUR_GOOGLE_API_KEY"  # Ensure to use your actual API key
 
 # Function to get place ID based on the name and location
 def get_place_id(name, lat, lng):
-    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
     params = {
         "key": API_KEY,
+        "query": name,
         "location": f"{lat},{lng}",
-        "radius": 1000,  # increased radius
-        "keyword": name
+        "radius": 5000
     }
     response = requests.get(url, params=params)
     results = response.json().get("results", [])
     
-    # Debug log
     if not results:
-        st.warning("No places found nearby. Try adjusting the name or increasing the radius.")
+        st.warning("No places found. Try changing the name or location.")
     else:
         st.success(f"Found {len(results)} place(s). Top match: {results[0]['name']}")
     
     return results[0]["place_id"] if results else None
+
 
 
 # Function to get reviews using place ID
