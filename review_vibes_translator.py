@@ -6,19 +6,22 @@ import os
 # Set the API key using environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")  # Ensure that the API key is set as an environment variable
 
-# Function to translate review using GPT-4
+# Function to translate review using GPT-4 (ChatCompletion)
 def translate_review(review, tone):
     prompt = f"Translate this review to Tanglish with a {tone} tone:\n\n{review}\n\nTanglish translation:"
     
     try:
-        # Using GPT-4 for chat completion
-        response = openai.Completion.create(
+        # Using GPT-4 Chat Completion
+        response = openai.ChatCompletion.create(
             model="gpt-4",  # GPT-4 model
-            prompt=prompt,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
             max_tokens=150,
             temperature=0.7
         )
-        translated_review = response['choices'][0]['text'].strip()
+        translated_review = response['choices'][0]['message']['content'].strip()
         return translated_review
     except Exception as e:
         st.error(f"Error in OpenAI API call: {e}")
