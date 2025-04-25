@@ -9,14 +9,20 @@ def get_place_id(name, lat, lng):
     params = {
         "key": API_KEY,
         "location": f"{lat},{lng}",
-        "radius": 100,
+        "radius": 500,  # increased radius
         "keyword": name
     }
     response = requests.get(url, params=params)
     results = response.json().get("results", [])
-    if results:
-        return results[0]["place_id"]
-    return None
+    
+    # Debug log
+    if not results:
+        st.warning("No places found nearby. Try adjusting the name or increasing the radius.")
+    else:
+        st.success(f"Found {len(results)} place(s). Top match: {results[0]['name']}")
+    
+    return results[0]["place_id"] if results else None
+
 
 # Function to get reviews using place ID
 def get_reviews(place_id):
