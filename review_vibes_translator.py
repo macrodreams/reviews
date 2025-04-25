@@ -1,42 +1,52 @@
 import streamlit as st
-import openai
+from openai import OpenAI
+import os
 
 # Set your OpenAI API key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# Title
-st.title("Review Vibes Translator")
-st.write("Convert boring reviews into *Tanglish* with vibes!")
+# Streamlit UI
+st.set_page_config(page_title="Review Vibes Translator 💬", layout="centered")
+st.title("✨ Review Vibes Translator")
+st.write("Convert English reviews into Tanglish with a vibe!")
 
-# Text input
-review_text = st.text_area("Paste the English Review")
+# Input section
+review_text = st.text_area("Enter your review here 👇", height=150)
 
-# Tone options
-tone = st.selectbox("Choose a Vibe", ["Casual", "Sarcastic", "Poetic", "Emotional", "Flirty", "Gossip"])
+tone_options = ["Casual", "Sarcastic", "Poetic", "Emotional", "Chill"]
+tone = st.selectbox("Choose a tone 🎭", tone_options)
 
-# Translate button
-if st.button("Translate to Tanglish"):
-    if not review_text.strip():
-        st.warning("Paste some review text first!")
-    else:
-        # Prompt for the LLM
-        prompt = f"""
-        You're Anika, a fun South Indian bestie who speaks in Tanglish.
-        Translate this English review into {tone} Tanglish.
-        Be expressive but keep the meaning clear.
-        
-        Review: {review_text}
-        
-        Tanglish ({tone} style):
-        """
+submit = st.button("Translate Vibe")
 
-        # Call GPT
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.9
-        )
+# Prompt templates
+TONE_PROMPTS = {
+    "Casual": "Convert this English review into friendly casual Tanglish",
+    "Sarcastic": "Convert this English review into sarcastic Tanglish with local flavour",
+    "Poetic": "Rewrite this review as a Tanglish poem using rhymes and similes",
+    "Emotional": "Express this review in emotional Tanglish with feeling",
+    "Chill": "Chill mode! Convert this review into laid-back, relaxed Tanglish"
+}
 
-        tanglish_output = response['choices'][0]['message']['content']
-        st.subheader("Translated Tanglish Review")
-        st.write(tanglish_output)
+if submit and review_text:
+    with st.spinner("Translating... hold tight da! 🎨"):
+        prompt = f"{TONE_PROMPTS[tone]}:\n\n\"{review_text}\""
+
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a Tanglish tone converter who adapts reviews into the selected tone."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            output = response.choices[0].message.content
+            st.subheader("🌟 Translated Review in Tanglish")
+            st.success(output)
+
+        except Exception as e:
+            st.error("Oops! Something went wrong.")
+            st.exception(e)
+
+# Optional footer
+st.markdown("---")
+st.caption("Made with ❤️ by Anika & you.")
