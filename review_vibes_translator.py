@@ -29,6 +29,11 @@ def translate_review(review, tone):
 
 # Sentiment analysis function
 def analyze_sentiment(review):
+    # Check if the review length is sufficient for sentiment analysis
+    if len(review.strip()) == 0:
+        st.write("Review is too short or empty. Please provide more details.")
+        return None
+    
     # Analyze sentiment using TextBlob
     blob = TextBlob(review)
     sentiment_score = blob.sentiment.polarity
@@ -62,7 +67,8 @@ if submit_button:
         if translated_review:
             # Analyze sentiment and get avatar URL
             sentiment_avatar_url = analyze_sentiment(translated_review)
-            st.write(f"Translated Review: {translated_review}")
-            st.image(sentiment_avatar_url)  # Display the image from the GitHub raw URL
+            if sentiment_avatar_url:
+                st.write(f"Translated Review: {translated_review}")
+                st.image(sentiment_avatar_url)  # Display the image from the GitHub raw URL
     else:
         st.write("Please enter a review to translate.")
