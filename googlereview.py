@@ -9,15 +9,15 @@ def get_place_id(name, lat, lng):
     params = {
         "key": API_KEY,
         "location": f"{lat},{lng}",
-        "radius": 5000,  # Increased radius to 5000 meters
+        "radius": 10000,  # Further increased radius to 10000 meters
         "keyword": name,
-        "type": "charging_station"  # Added 'charging_station' type to filter results
+        "type": "charging_station"  # Filter for charging stations
     }
     response = requests.get(url, params=params)
     results = response.json().get("results", [])
 
     # Debug log: Show the raw results returned by Google
-    st.json(results)  # Display the raw results for debugging
+    st.json(response.json())  # Display the full raw response for debugging
 
     if not results:
         st.warning("No places found nearby. Try adjusting the name or increasing the radius.")
