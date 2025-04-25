@@ -33,6 +33,9 @@ def analyze_sentiment(review):
     blob = TextBlob(review)
     sentiment_score = blob.sentiment.polarity
     
+    # Debugging: print the sentiment score to see if it's working
+    st.write(f"Sentiment Score: {sentiment_score}")
+    
     # Use raw GitHub URLs for images based on sentiment
     if sentiment_score > 0:
         return "https://raw.githubusercontent.com/macrodreams/reviews/main/positive-pup.png"
