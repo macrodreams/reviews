@@ -33,21 +33,13 @@ def analyze_sentiment(review):
     blob = TextBlob(review)
     sentiment_score = blob.sentiment.polarity
     
-    # Select avatar based on sentiment
+    # Use raw GitHub URLs for images based on sentiment
     if sentiment_score > 0:
-        image_path = "./positive-pup.png"  # Relative path to positive sentiment image
+        return "https://github.com/macrodreams/reviews/blob/main/positive-pup.png"
     elif sentiment_score < 0:
-        image_path = "./negative-pup.png"  # Relative path to negative sentiment image
+        return "https://github.com/macrodreams/reviews/blob/main/neutral-pup.png"
     else:
-        image_path = "./neutral-pup.png"  # Relative path to neutral sentiment image
-    
-    # Check if image exists and load
-    if os.path.exists(image_path):
-        with open(image_path, "rb") as img_file:
-            return img_file
-    else:
-        st.error(f"Image not found: {image_path}")
-        return None
+        return "https://github.com/macrodreams/reviews/blob/main/neutral-pup.png"
 
 # Streamlit UI setup
 st.title("Review Vibes Translator")
@@ -65,10 +57,9 @@ if submit_button:
         translated_review = translate_review(review_input, tone_input)
         
         if translated_review:
-            # Analyze sentiment and get avatar
-            sentiment_avatar = analyze_sentiment(translated_review)
-            if sentiment_avatar:
-                st.write(f"Translated Review: {translated_review}")
-                st.image(sentiment_avatar)
+            # Analyze sentiment and get avatar URL
+            sentiment_avatar_url = analyze_sentiment(translated_review)
+            st.write(f"Translated Review: {translated_review}")
+            st.image(sentiment_avatar_url)  # Display the image from the GitHub raw URL
     else:
         st.write("Please enter a review to translate.")
