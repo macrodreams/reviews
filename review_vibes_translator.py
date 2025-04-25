@@ -35,11 +35,19 @@ def analyze_sentiment(review):
     
     # Select avatar based on sentiment
     if sentiment_score > 0:
-        return "./positive-pup.png"  # Relative path to positive sentiment image
+        image_path = "./positive-pup.png"  # Relative path to positive sentiment image
     elif sentiment_score < 0:
-        return "./negative-pup.png"  # Relative path to negative sentiment image
+        image_path = "./negative-pup.png"  # Relative path to negative sentiment image
     else:
-        return "./neutral-pup.png"  # Relative path to neutral sentiment image
+        image_path = "./neutral-pup.png"  # Relative path to neutral sentiment image
+    
+    # Check if image exists and load
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            return img_file
+    else:
+        st.error(f"Image not found: {image_path}")
+        return None
 
 # Streamlit UI setup
 st.title("Review Vibes Translator")
@@ -59,12 +67,8 @@ if submit_button:
         if translated_review:
             # Analyze sentiment and get avatar
             sentiment_avatar = analyze_sentiment(translated_review)
-            st.write(f"Translated Review: {translated_review}")
-            
-            # Debugging: print the absolute path to check the image location
-            print("Image path:", os.path.abspath(sentiment_avatar))
-            
-            # Display the avatar image based on sentiment
-            st.image(sentiment_avatar)
+            if sentiment_avatar:
+                st.write(f"Translated Review: {translated_review}")
+                st.image(sentiment_avatar)
     else:
         st.write("Please enter a review to translate.")
