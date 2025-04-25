@@ -1,62 +1,51 @@
 import streamlit as st
 import openai
-import os
+from textblob import TextBlob
 
-# Set your OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Set your OpenAI API key securely
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-st.set_page_config(page_title="Review Vibes Translator", layout="centered")
+# Function to translate review into Tanglish with tone and emoji
+def translate_review(review, tone):
+    # Sentiment analysis using TextBlob
+    sentiment = TextBlob(review).sentiment.polarity
+    if sentiment > 0.3:
+        emoji = "😍"
+    elif sentiment < -0.3:
+        emoji = "😤"
+    else:
+        emoji = "😐"
+
+    prompt = (
+        f"Convert this English review to Tanglish (Tamil-English mixed) in a {tone} tone. "
+        f"End with an emoji matching the tone.\n\nReview: {review}\nTanglish:"
+    )
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7
+        )
+        tanglish_review = response.choices[0].message["content"]
+        return f"{tanglish_review.strip()} {emoji}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+# Streamlit UI
 st.title("🌀 Review Vibes Translator")
-st.markdown("Translate reviews into **Tanglish** with a chosen tone and vibe ✨")
 
-review_text = st.text_area("Paste your English review here:", height=150)
+st.markdown("Translate boring English reviews into **fun Tanglish** with customizable tone and auto sentiment emojis! 💬✨")
 
-tone = st.selectbox(
-    "Choose the tone:",
-    ["Casual", "Sarcastic", "Poetic", "Wholesome", "Comedic", "Filmy", "Rant"]
-)
+with st.sidebar:
+    st.header("Input ✍️")
+    review = st.text_area("Enter English Review", placeholder="This EV charger was fast and efficient.")
+    tone = st.selectbox("Select Tone", ["casual", "sarcastic", "poetic", "angry", "flirty", "funny"])
 
-submit = st.button("Translate to Tanglish 🪄")
-
-if submit and review_text:
-    with st.spinner("Translating with Anika's AI magic ✨"):
-        prompt = f"""Convert this English review into {tone} Tanglish and also detect sentiment as Positive, Negative or Neutral. 
-Give output in this format:
-Tanglish: <converted_text>
-Sentiment: <Positive/Negative/Neutral>
-
-Review: \"{review_text}\"""        
-
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a cool Tamil-English translator who understands tone and emotion."},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-
-            output = response.choices[0].message.content
-
-            if "Tanglish:" in output and "Sentiment:" in output:
-                lines = output.split("\n")
-                tanglish = lines[0].replace("Tanglish:", "").strip()
-                sentiment = lines[1].replace("Sentiment:", "").strip()
-
-                emoji_map = {
-                    "Positive": "😍✨💯",
-                    "Negative": "😤💔👎",
-                    "Neutral": "😐🤔🙃"
-                }
-                vibe = emoji_map.get(sentiment, "")
-
-                st.subheader(f"🌟 Translated Review in Tanglish {vibe}")
-                st.success(tanglish)
-            else:
-                st.warning("Hmm... Couldn't understand the format. Please try again.")
-
-        except Exception as e:
-            st.error(f"Something went wrong: {e}")
-
-elif submit:
-    st.warning("Please paste a review to translate.")
+if st.button("Translate"):
+    if review:
+        output = translate_review(review, tone)
+        st.subheader("Tanglish Translation 🔄")
+        st.write(output)
+    else:
+        st.warning("Please enter a review to translate.")
