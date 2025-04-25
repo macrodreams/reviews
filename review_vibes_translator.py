@@ -1,50 +1,73 @@
-import openai
 import streamlit as st
-from textblob import TextBlob  # To analyze sentiment
+import openai
+from textblob import TextBlob  # For sentiment analysis
+import re
 
-# Ensure you have stored your OpenAI API key in Streamlit's secret management
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Set your OpenAI API key here
+openai.api_key = "OPENAI_API_KEY"  # Replace with your actual OpenAI API key
 
-# Define function to get the response from OpenAI's chat model
-def get_openai_response(prompt, model="gpt-3.5-turbo"):
+# Function to get a translated review with emotional tone
+def get_translated_review(review, tone):
+    # Set up the system message to guide the assistant
+    system_message = f"Translate the following review with a {tone} tone."
+
+    # Set up the conversation history
+    messages = [
+        {"role": "system", "content": system_message},
+        {"role": "user", "content": review}
+    ]
+
+    # Call the OpenAI API for chat-based completion
     response = openai.ChatCompletion.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
+        model="gpt-4",  # Or you can use gpt-3.5-turbo
+        messages=messages
     )
-    return response.choices[0].message["content"]
 
-# Define a function to analyze sentiment and return emoji
-def analyze_sentiment(review_text):
-    # Use TextBlob to analyze the sentiment
-    blob = TextBlob(review_text)
-    sentiment_score = blob.sentiment.polarity  # Range from -1 (negative) to 1 (positive)
+    translated_review = response['choices'][0]['message']['content']
     
-    if sentiment_score > 0.2:
-        return "🙂"  # Positive sentiment
-    elif sentiment_score < -0.2:
-        return "😡"  # Negative sentiment
-    else:
-        return "😐"  # Neutral sentiment
+    return translated_review
 
-# Streamlit app logic
+# Function for sentiment analysis and emoji
+def analyze_sentiment(text):
+    # Use TextBlob to determine sentiment
+    blob = TextBlob(text)
+    sentiment_score = blob.sentiment.polarity  # Range: -1 (negative) to 1 (positive)
+    
+    # Map the sentiment score to an emoji
+    if sentiment_score > 0.2:
+        sentiment_emoji = "😊"  # Positive sentiment
+    elif sentiment_score < -0.2:
+        sentiment_emoji = "😞"  # Negative sentiment
+    else:
+        sentiment_emoji = "😐"  # Neutral sentiment
+    
+    return sentiment_score, sentiment_emoji
+
+# Streamlit interface
 st.title("Review Vibes Translator")
 
-# Input for user review
-review_input = st.text_area("Enter a review", "This place is awesome!")
+# Sidebar for user input
+st.sidebar.header("Enter Review and Tone")
+review_input = st.sidebar.text_area("Enter the Review", "I love this product! It's amazing.")  # Default review
+tone_input = st.sidebar.selectbox("Select Tone", ["casual", "sarcastic", "poetic", "formal"])
 
-# Button to submit the review for translation
-if st.button("Translate Review"):
+submit_button = st.sidebar.button("Translate Review")
+
+# Display output when button is pressed
+if submit_button:
     if review_input:
-        # Get the translated review (you can customize the prompt further)
-        translated_review = get_openai_response(f"Translate this review into Tanglish: {review_input}")
+        st.write(f"Original Review: {review_input}")
         
-        # Analyze sentiment
-        sentiment_emoji = analyze_sentiment(translated_review)
+        # Translate the review based on selected tone
+        translated_review = get_translated_review(review_input, tone_input)
         
-        # Display translated review with sentiment emoji
-        st.write(f"Translated Review: {translated_review} {sentiment_emoji}")
+        # Display translated review
+        st.write(f"Translated Review ({tone_input}): {translated_review}")
+        
+        # Perform sentiment analysis
+        sentiment_score, sentiment_emoji = analyze_sentiment(translated_review)
+        
+        # Display sentiment with emoji
+        st.write(f"Sentiment: {sentiment_score:.2f} {sentiment_emoji}")
     else:
-        st.error("Please enter a review!")
+        st.write("Please enter a review to translate.")
