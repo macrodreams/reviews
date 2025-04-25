@@ -5,14 +5,14 @@ from textblob import TextBlob
 # Set your OpenAI API Key
 openai.api_key = "YOUR_OPENAI_API_KEY"  # Make sure to replace with your actual key
 
-# Simplified OpenAI call for testing
+# Function to translate review using GPT-4
 def translate_review(review, tone):
     prompt = f"Translate this review to Tanglish with a {tone} tone:\n\n{review}\n\nTanglish translation:"
     
     try:
-        # Using the correct API method for OpenAI Completion in v1.0
+        # Using GPT-4 for completion
         response = openai.completions.create(
-            model="text-davinci-003",  # Simplified for testing
+            model="gpt-4",  # GPT-4 model
             prompt=prompt,
             max_tokens=150
         )
