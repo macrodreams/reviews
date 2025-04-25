@@ -3,16 +3,16 @@ import streamlit as st
 from textblob import TextBlob
 
 # Set your OpenAI API Key
-openai.api_key = "OPENAI_API_KEY"  # Make sure to replace with your actual key
+openai.api_key = "YOUR_OPENAI_API_KEY"  # Make sure to replace with your actual key
 
 # Simplified OpenAI call for testing
 def translate_review(review, tone):
     prompt = f"Translate this review to Tanglish with a {tone} tone:\n\n{review}\n\nTanglish translation:"
     
     try:
-        # Using a basic completions call for debugging
-        response = openai.Completion.create(
-            engine="text-davinci-003",  # Simplified for testing
+        # Using the correct API method for OpenAI Completion in v1.0
+        response = openai.completions.create(
+            model="text-davinci-003",  # Simplified for testing
             prompt=prompt,
             max_tokens=150
         )
