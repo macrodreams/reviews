@@ -9,7 +9,7 @@ def get_place_id(name, lat, lng):
     params = {
         "key": API_KEY,
         "location": f"{lat},{lng}",
-        "radius": 500,  # increased radius
+        "radius": 1000,  # increased radius
         "keyword": name
     }
     response = requests.get(url, params=params)
