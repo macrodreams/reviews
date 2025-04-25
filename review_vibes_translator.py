@@ -1,9 +1,10 @@
 import openai
 import streamlit as st
 from textblob import TextBlob
+import os
 
-# Set your OpenAI API Key here
-openai.api_key = "OPENAI_API_KEY"  # Replace with your actual API key
+# Set the API key using environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")  # Ensure that the API key is set as an environment variable
 
 # Function to translate review using GPT-4
 def translate_review(review, tone):
@@ -11,12 +12,12 @@ def translate_review(review, tone):
     
     try:
         # Using GPT-4 for completion
-        response = openai.Completion.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4",  # GPT-4 model
-            prompt=prompt,
-            max_tokens=150
+            messages=[{"role": "system", "content": "You are a helpful assistant."},
+                      {"role": "user", "content": prompt}]
         )
-        translated_review = response.choices[0].text.strip()
+        translated_review = response['choices'][0]['message']['content'].strip()
         return translated_review
     except Exception as e:
         st.error(f"Error in OpenAI API call: {e}")
