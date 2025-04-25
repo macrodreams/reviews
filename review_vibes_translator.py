@@ -38,18 +38,15 @@ review_input = st.text_area("Enter the Review Text:")
 
 if review_input:
     try:
-        # Adjusted for OpenAI API >=1.0.0, using the newer chat completions endpoint
-        response = openai.chat.Completion.create(
+        # Corrected method for OpenAI API v1.0.0 and above
+        response = openai.completions.create(
             model="gpt-3.5-turbo",  # Use the appropriate model version
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": f"Translate the following review into a {tone} tone:\n{review_input}"}
-            ],
+            prompt=f"Translate the following review into a {tone} tone:\n{review_input}",
             max_tokens=150,
             temperature=0.7,
         )
 
-        translated_review = response['choices'][0]['message']['content'].strip()
+        translated_review = response['choices'][0]['text'].strip()
 
         # Get sentiment emoji
         sentiment_emoji = get_sentiment_emoji(review_input)
@@ -61,4 +58,3 @@ if review_input:
 
     except Exception as e:
         st.error(f"Error occurred: {e}")
-
