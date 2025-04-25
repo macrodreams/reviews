@@ -38,8 +38,8 @@ review_input = st.text_area("Enter the Review Text:")
 
 if review_input:
     try:
-        # Corrected method for OpenAI API v1.0.0 and above using the chat completions endpoint
-        response = openai.chat_completions.create(
+        # Correct method for OpenAI API v1.0.0 and above using the chat completions endpoint
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",  # Use the appropriate model version
             messages=[{
                 "role": "system", "content": "You are a helpful assistant."},
