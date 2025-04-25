@@ -37,7 +37,7 @@ def analyze_sentiment(review):
     if sentiment_score > 0:
         return "https://raw.githubusercontent.com/macrodreams/reviews/main/positive-pup.png"
     elif sentiment_score < 0:
-        return "https://raw.githubusercontent.com/macrodreams/reviews/main/neutral-pup.png"
+        return "https://raw.githubusercontent.com/macrodreams/reviews/main/negative-pup.png"
     else:
         return "https://raw.githubusercontent.com/macrodreams/reviews/main/neutral-pup.png"
 
