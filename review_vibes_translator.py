@@ -10,8 +10,8 @@ tone = st.sidebar.selectbox("Select Tone", ["Casual", "Sarcastic", "Poetic", "Po
 
 submit = st.sidebar.button("Submit Query")
 
-# OpenAI API configuration
-openai.api_key = "YOUR_OPENAI_API_KEY"  # Add your OpenAI API key here
+# Access the secret key stored in Streamlit Cloud
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def generate_review_translation(review, tone):
     try:
