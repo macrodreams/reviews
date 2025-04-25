@@ -35,11 +35,11 @@ def analyze_sentiment(review):
     
     # Use raw GitHub URLs for images based on sentiment
     if sentiment_score > 0:
-        return "https://github.com/macrodreams/reviews/blob/main/positive-pup.png"
+        return "https://raw.githubusercontent.com/macrodreams/reviews/main/positive-pup.png"
     elif sentiment_score < 0:
-        return "https://github.com/macrodreams/reviews/blob/main/neutral-pup.png"
+        return "https://raw.githubusercontent.com/macrodreams/reviews/main/neutral-pup.png"
     else:
-        return "https://github.com/macrodreams/reviews/blob/main/neutral-pup.png"
+        return "https://raw.githubusercontent.com/macrodreams/reviews/main/neutral-pup.png"
 
 # Streamlit UI setup
 st.title("Review Vibes Translator")
