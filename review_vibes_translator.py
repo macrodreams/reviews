@@ -28,6 +28,21 @@ def translate_review(review, tone):
         return None
 
 # Sentiment analysis function
+
+positive_avatar = "positive-pup.png"
+negative_avatar = "negative-pup.png"
+neutral_avatar = "neutral-pup.png"
+
+# Calculate sentiment score
+sentiment_score = blob.sentiment.polarity
+
+if sentiment_score > 0:
+    return positive_avatar  # Positive sentiment
+elif sentiment_score < 0:
+    return negative_avatar  # Negative sentiment
+else:
+    return neutral_avatar  # Neutral sentiment
+
 def analyze_sentiment(review):
     blob = TextBlob(review)
     sentiment_score = blob.sentiment.polarity
