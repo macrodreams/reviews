@@ -11,13 +11,14 @@ def translate_review(review, tone):
     prompt = f"Translate this review to Tanglish with a {tone} tone:\n\n{review}\n\nTanglish translation:"
     
     try:
-        # Using GPT-4 for completion
-        response = openai.ChatCompletion.create(
+        # Using GPT-4 for chat completion
+        response = openai.Completion.create(
             model="gpt-4",  # GPT-4 model
-            messages=[{"role": "system", "content": "You are a helpful assistant."},
-                      {"role": "user", "content": prompt}]
+            prompt=prompt,
+            max_tokens=150,
+            temperature=0.7
         )
-        translated_review = response['choices'][0]['message']['content'].strip()
+        translated_review = response['choices'][0]['text'].strip()
         return translated_review
     except Exception as e:
         st.error(f"Error in OpenAI API call: {e}")
