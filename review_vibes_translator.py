@@ -28,30 +28,18 @@ def translate_review(review, tone):
         return None
 
 # Sentiment analysis function
-
-positive_avatar = "positive-pup.png"
-negative_avatar = "negative-pup.png"
-neutral_avatar = "neutral-pup.png"
-
-# Calculate sentiment score
-sentiment_score = blob.sentiment.polarity
-
-if sentiment_score > 0:
-    return positive_avatar  # Positive sentiment
-elif sentiment_score < 0:
-    return negative_avatar  # Negative sentiment
-else:
-    return neutral_avatar  # Neutral sentiment
-
 def analyze_sentiment(review):
+    # Analyze sentiment using TextBlob
     blob = TextBlob(review)
     sentiment_score = blob.sentiment.polarity
+    
+    # Select avatar based on sentiment
     if sentiment_score > 0:
-        return "😊"  # Positive sentiment
+        return "positive-pup.png"  # Positive sentiment
     elif sentiment_score < 0:
-        return "😡"  # Negative sentiment
+        return "negative-pup.png"  # Negative sentiment
     else:
-        return "😐"  # Neutral sentiment
+        return "neutral-pup.png"  # Neutral sentiment
 
 # Streamlit UI setup
 st.title("Review Vibes Translator")
@@ -69,8 +57,9 @@ if submit_button:
         translated_review = translate_review(review_input, tone_input)
         
         if translated_review:
-            # Analyze sentiment and add emoji
-            sentiment_emoji = analyze_sentiment(translated_review)
-            st.write(f"Translated Review: {translated_review} {sentiment_emoji}")
+            # Analyze sentiment and get avatar
+            sentiment_avatar = analyze_sentiment(translated_review)
+            st.write(f"Translated Review: {translated_review}")
+            st.image(sentiment_avatar)  # Display the avatar image based on sentiment
     else:
         st.write("Please enter a review to translate.")
