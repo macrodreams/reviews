@@ -1,63 +1,51 @@
 import streamlit as st
 import openai
 
-# Function to get sentiment emoji based on sentiment analysis
-def get_sentiment_emoji(text):
-    positive_keywords = ['good', 'great', 'amazing', 'excellent', 'love', 'happy', 'fantastic']
-    negative_keywords = ['bad', 'poor', 'horrible', 'terrible', 'hate', 'worst']
-    
-    # Default sentiment
-    sentiment = "neutral"
-    
-    # Convert to lowercase for simpler keyword matching
-    text = text.lower()
-    
-    # Check for positive or negative keywords in the review text
-    if any(keyword in text for keyword in positive_keywords):
-        sentiment = "positive"
-    elif any(keyword in text for keyword in negative_keywords):
-        sentiment = "negative"
-    
-    # Return emoji based on sentiment
-    if sentiment == "positive":
-        return "😊"  # Happy emoji for positive sentiment
-    elif sentiment == "negative":
-        return "😞"  # Sad emoji for negative sentiment
-    else:
-        return "😐"  # Neutral emoji for neutral sentiment
-
-# Initialize OpenAI API key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-
-# Streamlit UI components
+# Streamlit interface for custom prompt
 st.title("Review Vibes Translator")
-st.sidebar.header("Select Tone for Review Translation")
-tone = st.sidebar.selectbox("Select Tone", ["Casual", "Sarcastic", "Poetic", "Formal"])
 
-review_input = st.text_area("Enter the Review Text:")
+st.sidebar.header("Enter Review Details")
+review_text = st.sidebar.text_area("Enter the Review Text", "")
+tone = st.sidebar.selectbox("Select Tone", ["Casual", "Sarcastic", "Poetic", "Positive", "Negative"])
 
-if review_input:
+submit = st.sidebar.button("Submit Query")
+
+# OpenAI API configuration
+openai.api_key = "YOUR_OPENAI_API_KEY"  # Add your OpenAI API key here
+
+def generate_review_translation(review, tone):
     try:
-        # Correct method for OpenAI API v1.0.0 and above using the chat completions endpoint
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Use the appropriate model version
-            messages=[{
-                "role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": f"Translate the following review into a {tone} tone:\n{review_input}"}
-            ],
+        # Construct the prompt based on tone selection
+        prompt = f"Translate this review into a {tone} tone:\n\n{review}"
+
+        # Request to OpenAI GPT model
+        response = openai.Completion.create(
+            model="gpt-4",  # Use GPT-4 model or the one you prefer
+            prompt=prompt,
             max_tokens=150,
-            temperature=0.7,
+            temperature=0.7
         )
 
-        translated_review = response['choices'][0]['message']['content'].strip()
+        # Parse the translated review from the API response
+        translated_review = response.choices[0].text.strip()
 
-        # Get sentiment emoji
-        sentiment_emoji = get_sentiment_emoji(review_input)
-
-        # Display translated review and sentiment emoji
-        st.subheader("Translated Review:")
-        st.write(translated_review)
-        st.markdown(f"Sentiment: {sentiment_emoji}")
+        return translated_review
 
     except Exception as e:
-        st.error(f"Error occurred: {e}")
+        return f"Error occurred: {str(e)}"
+
+# Handling the translation when the user submits the form
+if submit:
+    if review_text:
+        # Call the translation function based on the review text and tone
+        translated_review = generate_review_translation(review_text, tone)
+        
+        # Display original review
+        st.subheader("Original Review:")
+        st.write(review_text)
+        
+        # Display translated review
+        st.subheader(f"Translated Review ({tone} tone):")
+        st.write(translated_review)
+    else:
+        st.write("Please enter a review to translate.")
